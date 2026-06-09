@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom'
 // import { SketchPicker } from 'react-color'
 import { EVENT_COLORS } from '@/store/settingsStore'
 import { useCalendarStore } from '@/store/calendarStore'
-import styles from './ColorPickerDialog.module.css'
+import styles from './AddCalendarModal.module.css'
 
 interface ColorPickerModalProps {
   isOpen: boolean
@@ -35,19 +35,20 @@ export function ColorPickerModal({ isOpen, calendarId, onClose }: ColorPickerMod
     setFormSubmitted(true)
     setError('')
 
-    try {
-      updateCalendar(calendarId, { color: color })
-      handleClose()
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Failed to update calendar color'
-      setError(errorMsg)
-    } finally {
-      setFormSubmitted(false)
-    }
+    // try {
+    //   updateCalendar(calendarId, { color: color })
+    //   handleClose()
+    // } catch (err) {
+    //   const errorMsg = err instanceof Error ? err.message : 'Failed to update calendar color'
+    //   setError(errorMsg)
+    // } finally {
+    //   setFormSubmitted(false)
+    // }
   }
 
   const handleClose = (): void => {
-    setColor(EVENT_COLORS[0])
+    // setColor(EVENT_COLORS[0])
+    updateCalendar(calendarId, { color: color })
     setError('')
     onClose()
   }
