@@ -27,8 +27,29 @@ import { showToast } from '@/lib/toast'
 import { AddCalendarModal } from './AddCalendarModal'
 import { CreateCalendarModal } from './CreateCalendarModal'
 import { DeleteCalendarDialog } from './DeleteCalendarDialog'
+import { ColorPickerModal } from './ColorPickerModal'
 import { MiniTasksSection } from './MiniTasksSection'
 import styles from './Sidebar.module.css'
+
+// const CALENDAR_COLORS = [
+//   '#4285F4',
+//   '#EA4335',
+//   '#34A853',
+//   '#FBBC05',
+//   '#FF6D01',
+//   '#46BDC6',
+//   '#7B1FA2',
+//   '#C2185B',
+//   '#00796B',
+//   '#F57C00',
+//   '#455A64',
+//   '#5D4037',
+// ]
+
+// function getNextColor(currentColor: string): string {
+//   const idx = CALENDAR_COLORS.indexOf(currentColor)
+//   return CALENDAR_COLORS[(idx + 1) % CALENDAR_COLORS.length]
+// }
 
 interface SidebarProps {
   isOpen?: boolean
@@ -67,6 +88,8 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
   const [showDeleteCalendar, setShowDeleteCalendar] = useState(false)
   const [deleteCalendarId, setDeleteCalendarId] = useState<string | null>(null)
   const [deleteCalendarName, setDeleteCalendarName] = useState('')
+  const [showColorPicker, setShowColorPicker] = useState(false)
+  const getCalendarId = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const currentDate = useCalendarStore((state) => state.currentDate)
@@ -214,10 +237,10 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
     if (editingId && editName.trim()) {
       const oldName = calendars.find((c) => c.id === editingId)?.name
       const newName = editName.trim()
-      
+
       // Update local store immediately
       updateCalendar(editingId, { name: newName })
-      
+
       // If it's a CalDAV calendar, also update on server
       const calendar = calendars.find((c) => c.id === editingId)
       if (calendar?.accountId) {
@@ -245,10 +268,10 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
     }
   }
 
-  const handleColorClick = (calendarId: string, currentColor: string): void => {
-    const nextColor = getNextColor(currentColor)
-    updateCalendar(calendarId, { color: nextColor })
-  }
+  // const handleColorClick = (calendarId: string, currentColor: string): void => {
+  //   const nextColor = getNextColor(currentColor)
+  //   updateCalendar(calendarId, { color: nextColor })
+  // }
 
   const [isResizing, setIsResizing] = useState(false)
   const COLLAPSE_THRESHOLD = 255
@@ -398,9 +421,8 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
                       <button
                         key={month}
                         onClick={() => handleMonthSelect(index)}
-                        className={`${styles.yearOption} ${
-                          index === effectiveMiniDate.getMonth() ? styles.yearOptionSelected : ''
-                        }`}
+                        className={`${styles.yearOption} ${index === effectiveMiniDate.getMonth() ? styles.yearOptionSelected : ''
+                          }`}
                       >
                         {month}
                       </button>
@@ -416,9 +438,8 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
                       <button
                         key={year}
                         onClick={() => handleYearSelect(year)}
-                        className={`${styles.yearOption} ${
-                          year === effectiveMiniDate.getFullYear() ? styles.yearOptionSelected : ''
-                        }`}
+                        className={`${styles.yearOption} ${year === effectiveMiniDate.getFullYear() ? styles.yearOptionSelected : ''
+                          }`}
                       >
                         {year}
                       </button>
@@ -446,9 +467,8 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
               return (
                 <button
                   key={day.toISOString()}
-                  className={`${styles.miniDay} ${!isCurrentMonth ? styles.otherMonth : ''} ${
-                    isSelected ? styles.selected : ''
-                  } ${isTodayDate ? styles.today : ''}`}
+                  className={`${styles.miniDay} ${!isCurrentMonth ? styles.otherMonth : ''} ${isSelected ? styles.selected : ''
+                    } ${isTodayDate ? styles.today : ''}`}
                   onClick={() => handleDayClick(day)}
                   onDoubleClick={() => handleDayDoubleClick(day)}
                 >
@@ -490,7 +510,7 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
               <button
                 className={styles.colorDot}
                 style={{ backgroundColor: calendar.color }}
-                onClick={() => handleColorClick(calendar.id, calendar.color)}
+                onClick={() => setShowColorPicker(true)}
                 title="Click to change color"
               />
               {editingId === calendar.id ? (
@@ -631,6 +651,12 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
           </div>
         </div>
 
+        <ColorPickerModal
+          isOpen={showColorPicker}
+          onClose={() => {
+            setShowColorPicker(false)
+          }}
+          calendarId={getCalendarId} />
         <AddCalendarModal isOpen={showAddCalendar} onClose={() => setShowAddCalendar(false)} />
         <CreateCalendarModal
           isOpen={showCreateCalendar}
@@ -691,50 +717,50 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
                 // CalDAV calendar options
                 ...calendars.find((c) => c.id === contextMenu.calendarId)?.accountId
                   ? [
-                      {
-                        label: 'Rename',
-                        onClick: () => {
-                          const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
-                          if (calendar) {
-                            setEditingId(calendar.id)
-                            setEditName(calendar.name)
-                          }
-                          closeContextMenu()
-                        },
+                    {
+                      label: 'Rename',
+                      onClick: () => {
+                        const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
+                        if (calendar) {
+                          setEditingId(calendar.id)
+                          setEditName(calendar.name)
+                        }
+                        closeContextMenu()
                       },
-                      {
-                        label: 'Create Calendar Here',
-                        onClick: () => {
-                          const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
-                          if (calendar?.accountId) {
-                            setCreateCalendarAccountId(calendar.accountId)
-                            setShowCreateCalendar(true)
-                          }
-                          closeContextMenu()
-                        },
+                    },
+                    {
+                      label: 'Create Calendar Here',
+                      onClick: () => {
+                        const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
+                        if (calendar?.accountId) {
+                          setCreateCalendarAccountId(calendar.accountId)
+                          setShowCreateCalendar(true)
+                        }
+                        closeContextMenu()
                       },
-                      {
-                        label: 'Delete',
-                        onClick: () => {
-                          const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
-                          if (calendar) {
-                            setDeleteCalendarId(calendar.id)
-                            setDeleteCalendarName(calendar.name)
-                            setShowDeleteCalendar(true)
-                          }
-                          closeContextMenu()
-                        },
+                    },
+                    {
+                      label: 'Delete',
+                      onClick: () => {
+                        const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
+                        if (calendar) {
+                          setDeleteCalendarId(calendar.id)
+                          setDeleteCalendarName(calendar.name)
+                          setShowDeleteCalendar(true)
+                        }
+                        closeContextMenu()
                       },
-                    ]
+                    },
+                  ]
                   : [
-                      {
-                        label: 'Remove',
-                        onClick: () => {
-                          deleteCalendar(contextMenu.calendarId)
-                          closeContextMenu()
-                        },
+                    {
+                      label: 'Remove',
+                      onClick: () => {
+                        deleteCalendar(contextMenu.calendarId)
+                        closeContextMenu()
                       },
-                    ],
+                    },
+                  ],
               ]}
               onClose={closeContextMenu}
               menuId="calendar-context"

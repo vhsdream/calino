@@ -80,7 +80,11 @@ export const useCalendarStore = create<CalendarStore>()(
           return
         }
         const state = get()
-        const autoCategoryNames = applyAutoCategories(event.title, state.autoCategoryRules, state.categories)
+        const autoCategoryNames = applyAutoCategories(
+          event.title,
+          state.autoCategoryRules,
+          state.categories
+        )
         const existingCategories = event.categories || []
         const finalEvent = {
           ...event,
@@ -134,7 +138,11 @@ export const useCalendarStore = create<CalendarStore>()(
         if (safeUpdates.title) {
           const existingEvent = state.events.find((e) => e.id === id)
           if (existingEvent) {
-            const autoCategoryNames = applyAutoCategories(safeUpdates.title, state.autoCategoryRules, state.categories)
+            const autoCategoryNames = applyAutoCategories(
+              safeUpdates.title,
+              state.autoCategoryRules,
+              state.categories
+            )
             const existingCategories = safeUpdates.categories || existingEvent.categories || []
             safeUpdates.categories = [...new Set([...existingCategories, ...autoCategoryNames])]
           }
@@ -347,9 +355,8 @@ export const useCalendarStore = create<CalendarStore>()(
       toggleCategoryFilter: (categoryId: string): void => {
         const current = get().selectedCategoryIds
         const index = current.indexOf(categoryId)
-        const newValue = index === -1
-          ? [...current, categoryId]
-          : current.filter((id) => id !== categoryId)
+        const newValue =
+          index === -1 ? [...current, categoryId] : current.filter((id) => id !== categoryId)
         set({ selectedCategoryIds: newValue })
       },
 
@@ -413,11 +420,10 @@ export const useCalendarStore = create<CalendarStore>()(
         const state = get()
         const visibleCalendarIds = state.calendars.filter((c) => c.isVisible).map((c) => c.id)
         const selectedCategoryIds = state.selectedCategoryIds
-        const selectedCategoryNames = selectedCategoryIds.length > 0
-          ? state.categories
-              .filter((c) => selectedCategoryIds.includes(c.id))
-              .map((c) => c.name)
-          : []
+        const selectedCategoryNames =
+          selectedCategoryIds.length > 0
+            ? state.categories.filter((c) => selectedCategoryIds.includes(c.id)).map((c) => c.name)
+            : []
 
         const parseDate = parseISO(start)
         const parseDateEnd = parseISO(end)
@@ -434,9 +440,17 @@ export const useCalendarStore = create<CalendarStore>()(
         let endDate: Date
         if (isDateOnlyStart && start.endsWith('Z')) {
           // UTC date-only: use UTC start of day
-          startDate = new Date(Date.UTC(
-            parseDate.getUTCFullYear(), parseDate.getUTCMonth(), parseDate.getUTCDate(), 0, 0, 0, 0
-          ))
+          startDate = new Date(
+            Date.UTC(
+              parseDate.getUTCFullYear(),
+              parseDate.getUTCMonth(),
+              parseDate.getUTCDate(),
+              0,
+              0,
+              0,
+              0
+            )
+          )
         } else if (isDateOnlyStart) {
           startDate = startOfDay(parseDate)
         } else {
@@ -446,9 +460,17 @@ export const useCalendarStore = create<CalendarStore>()(
 
         if (isDateOnlyEnd && end.endsWith('Z')) {
           // UTC date-only: use UTC end of day
-          endDate = new Date(Date.UTC(
-            parseDateEnd.getUTCFullYear(), parseDateEnd.getUTCMonth(), parseDateEnd.getUTCDate(), 23, 59, 59, 999
-          ))
+          endDate = new Date(
+            Date.UTC(
+              parseDateEnd.getUTCFullYear(),
+              parseDateEnd.getUTCMonth(),
+              parseDateEnd.getUTCDate(),
+              23,
+              59,
+              59,
+              999
+            )
+          )
         } else if (isDateOnlyEnd) {
           endDate = endOfDay(parseDateEnd)
         } else {
@@ -492,7 +514,10 @@ export const useCalendarStore = create<CalendarStore>()(
           if (!visibleCalendarIds.includes(event.calendarId)) {
             continue
           }
-          if (selectedCategoryNames.length > 0 && !event.categories?.some((c) => selectedCategoryNames.includes(c))) {
+          if (
+            selectedCategoryNames.length > 0 &&
+            !event.categories?.some((c) => selectedCategoryNames.includes(c))
+          ) {
             continue
           }
 
@@ -522,7 +547,7 @@ export const useCalendarStore = create<CalendarStore>()(
                 const occEnd = new Date(occ.getTime() + duration)
 
                 const occDateStr = occ.toISOString().split('T')[0]
-                if (excludedDates.some(d => d.split('T')[0] === occDateStr)) {
+                if (excludedDates.some((d) => d.split('T')[0] === occDateStr)) {
                   continue
                 }
 
@@ -664,10 +689,7 @@ function applyAutoCategories(
 
 // ── Journal helpers ─────────────────────────────────────────────────────
 
-export function getJournalEntriesForDate(
-  events: CalendarEvent[],
-  date: string
-): CalendarEvent[] {
+export function getJournalEntriesForDate(events: CalendarEvent[], date: string): CalendarEvent[] {
   return events.filter((e) => e.type === 'journal' && e.start === date)
 }
 
@@ -682,9 +704,7 @@ export function getJournalEntriesForMonth(
     .sort((a, b) => b.start.localeCompare(a.start))
 }
 
-export function getJournalDates(
-  events: CalendarEvent[]
-): Set<string> {
+export function getJournalDates(events: CalendarEvent[]): Set<string> {
   const dates = new Set<string>()
   for (const e of events) {
     if (e.type === 'journal') dates.add(e.start)

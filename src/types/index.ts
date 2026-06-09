@@ -1,4 +1,11 @@
-export type RecurrenceFrequency = 'secondly' | 'minutely' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly'
+export type RecurrenceFrequency =
+  | 'secondly'
+  | 'minutely'
+  | 'hourly'
+  | 'daily'
+  | 'weekly'
+  | 'monthly'
+  | 'yearly'
 
 import type { Category, AutoCategoryRule } from './categories'
 
@@ -39,10 +46,10 @@ export type SyncStatus = 'synced' | 'pending' | 'failed'
 export type TaskPriority = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 
 export interface CalendarAttachment {
-  href: string        // URL or data URI for inline attachments
+  href: string // URL or data URI for inline attachments
   contentType: string // MIME type
-  size?: number       // bytes
-  filename?: string   // display name
+  size?: number // bytes
+  filename?: string // display name
 }
 
 export interface BrokenEvent {
