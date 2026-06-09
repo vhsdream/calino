@@ -89,7 +89,6 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
   const [deleteCalendarId, setDeleteCalendarId] = useState<string | null>(null)
   const [deleteCalendarName, setDeleteCalendarName] = useState('')
   const [showColorPicker, setShowColorPicker] = useState(false)
-  const getCalendarId = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const currentDate = useCalendarStore((state) => state.currentDate)
@@ -653,10 +652,11 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
 
         <ColorPickerModal
           isOpen={showColorPicker}
+          calendarId=''
           onClose={() => {
             setShowColorPicker(false)
           }}
-          calendarId={getCalendarId} />
+        />
         <AddCalendarModal isOpen={showAddCalendar} onClose={() => setShowAddCalendar(false)} />
         <CreateCalendarModal
           isOpen={showCreateCalendar}
