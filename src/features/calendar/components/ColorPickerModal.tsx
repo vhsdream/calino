@@ -35,21 +35,20 @@ export function ColorPickerModal({ isOpen, calendarId, onClose }: ColorPickerMod
     setFormSubmitted(true)
     setError('')
 
-    // try {
-    //   updateCalendar(calendarId, { color: color })
-    //   handleClose()
-    // } catch (err) {
-    //   const errorMsg = err instanceof Error ? err.message : 'Failed to update calendar color'
-    //   setError(errorMsg)
-    // } finally {
-    //   setFormSubmitted(false)
-    // }
+    try {
+      updateCalendar(calendarId, { color: color })
+      handleClose()
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to update calendar color'
+      setError(errorMsg)
+    } finally {
+      setFormSubmitted(false)
+    }
   }
 
   const handleClose = (): void => {
-    // setColor(EVENT_COLORS[0])
-    updateCalendar(calendarId, { color: color })
     setError('')
+    // setColor(EVENT_COLORS[0])
     onClose()
   }
 
