@@ -1,8 +1,8 @@
 import type { JSX } from 'react'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-// import { SketchPicker } from 'react-color'
-import { EVENT_COLORS } from '@/store/settingsStore'
+import { SketchPicker } from 'react-color'
+// import { EVENT_COLORS } from '@/store/settingsStore'
 import { useCalendarStore } from '@/store/calendarStore'
 import styles from './AddCalendarModal.module.css'
 
@@ -14,17 +14,21 @@ interface ColorPickerModalProps {
 }
 
 export function ColorPickerModal({ isOpen, calendarId, calendarName, onClose }: ColorPickerModalProps): JSX.Element | null {
-  const [color, setColor] = useState<string>(EVENT_COLORS[0])
+  const [color, setColor] = useState<string>('#4285F4')
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
   const updateCalendar = useCalendarStore((state) => state.updateCalendar)
-  const [error, setError] = useState('')
+  const [error, setError] = useState<string>('')
 
   useEffect(() => {
     if (isOpen) {
-      setColor(EVENT_COLORS[0])
+      setColor('#4285F4')
       setError('')
     }
   }, [isOpen])
+
+  const handleChange = (newColor: { hex: string }): void => {
+    setColor(newColor.hex)
+  }
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
@@ -78,16 +82,7 @@ export function ColorPickerModal({ isOpen, calendarId, calendarName, onClose }: 
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>Color</label>
             <div className={styles.colorGrid}>
-              {EVENT_COLORS.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  className={`${styles.colorOption} ${color === c ? styles.colorSelected : ''}`}
-                  style={{ backgroundColor: c }}
-                  onClick={() => setColor(c)}
-                  aria-label={`Select color ${c}`}
-                />
-              ))}
+              <SketchPicker color={color} onChangeComplete={handleChange} />
             </div>
           </div>
           {error && <p className={styles.errorMessage}>{error}</p>}
