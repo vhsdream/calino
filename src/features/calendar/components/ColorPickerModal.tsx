@@ -9,18 +9,15 @@ import styles from './AddCalendarModal.module.css'
 interface ColorPickerModalProps {
   isOpen: boolean
   calendarId: string
+  calendarName: string
   onClose: () => void
 }
 
-export function ColorPickerModal({ isOpen, calendarId, onClose }: ColorPickerModalProps): JSX.Element | null {
+export function ColorPickerModal({ isOpen, calendarId, calendarName, onClose }: ColorPickerModalProps): JSX.Element | null {
   const [color, setColor] = useState<string>(EVENT_COLORS[0])
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
   const updateCalendar = useCalendarStore((state) => state.updateCalendar)
   const [error, setError] = useState('')
-
-  // const handleChange = (newColor: { hex: string }) => {
-  //   setColor(newColor.hex)
-  // }
 
   useEffect(() => {
     if (isOpen) {
@@ -36,7 +33,7 @@ export function ColorPickerModal({ isOpen, calendarId, onClose }: ColorPickerMod
     setError('')
 
     try {
-      updateCalendar(calendarId, { color: color })
+      updateCalendar(calendarId, { color })
       handleClose()
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to update calendar color'
@@ -48,7 +45,6 @@ export function ColorPickerModal({ isOpen, calendarId, onClose }: ColorPickerMod
 
   const handleClose = (): void => {
     setError('')
-    // setColor(EVENT_COLORS[0])
     onClose()
   }
 
@@ -72,7 +68,7 @@ export function ColorPickerModal({ isOpen, calendarId, onClose }: ColorPickerMod
       >
         <div className={styles.modalHeader}>
           <h3 className={styles.modalTitle} id="modal-title">
-            Calendar Color Picker
+            Choose a color for: {calendarName}
           </h3>
           <button className={styles.modalClose} onClick={handleClose} aria-label="Close">
             ✕

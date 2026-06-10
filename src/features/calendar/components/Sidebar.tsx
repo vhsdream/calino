@@ -90,6 +90,7 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
   const [deleteCalendarName, setDeleteCalendarName] = useState('')
   const [showColorPicker, setShowColorPicker] = useState(false)
   const [colorPickerId, setColorPickerId] = useState<string>('')
+  const [colorPickerName, setColorPickerName] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const currentDate = useCalendarStore((state) => state.currentDate)
@@ -267,6 +268,8 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
       setEditName('')
     }
   }
+
+  // const selectedCalendarId = calendars.find((c) => c.id === colorPickerId)
 
   // const handleColorClick = (calendarId: string, currentColor: string): void => {
   //   const nextColor = getNextColor(currentColor)
@@ -510,7 +513,12 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
               <button
                 className={styles.colorDot}
                 style={{ backgroundColor: calendar.color }}
-                onClick={() => setShowColorPicker(true)}
+                onClick={() => {
+                  setShowColorPicker(true)
+                  setColorPickerId(calendar.id)
+                  setColorPickerName(calendar.name)
+                }
+                }
                 title="Click to change color"
               />
               {editingId === calendar.id ? (
@@ -654,9 +662,11 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
         <ColorPickerModal
           isOpen={showColorPicker}
           calendarId={colorPickerId}
+          calendarName={colorPickerName}
           onClose={() => {
             setShowColorPicker(false)
             setColorPickerId('')
+            setColorPickerName('')
           }}
         />
         <AddCalendarModal isOpen={showAddCalendar} onClose={() => setShowAddCalendar(false)} />
