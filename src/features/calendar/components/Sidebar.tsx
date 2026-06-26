@@ -18,7 +18,7 @@ import {
   subMonths,
   parseISO,
 } from 'date-fns'
-import { config, TOAST_DURATION_MS, getNextColor } from '@/config'
+// import { config, TOAST_DURATION_MS } from '@/config'
 import { useCalendarStore } from '@/store/calendarStore'
 import { useSettingsStore } from '@/store/settingsStore'
 import { useCalDAV } from '@/features/caldav/hooks/useCalDAV'
@@ -388,383 +388,383 @@ export function Sidebar({ isOpen = false, onClose, isCollapsed: controlledCollap
               <span className={styles.sidebarBrandName}>Calino</span>
             </div>
           )}
-        <div className={styles.miniCalendar}>
-          <div className={styles.miniHeader}>
-            <button onClick={handlePrevMonth} className={styles.miniNavBtn} aria-label="Previous month">
-              <ChevronLeft />
-            </button>
-            <div style={{ position: 'relative' }} ref={dropdownRef}>
-              <span className={styles.miniMonth}>
-                <button onClick={handleMonthClick} className={styles.miniMonthButton}>
-                  {format(effectiveMiniDate, 'MMMM')}
-                </button>
-                {showMonthDropdown && (
-                  <div className={styles.yearDropdown}>
-                    {months.map((month, index) => (
-                      <button
-                        key={month}
-                        onClick={() => handleMonthSelect(index)}
-                        className={`${styles.yearOption} ${index === effectiveMiniDate.getMonth() ? styles.yearOptionSelected : ''
-                          }`}
-                      >
-                        {month}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <button onClick={handleYearClick} className={styles.miniMonthButton}>
-                  {format(effectiveMiniDate, 'yyyy')}
-                </button>
-                {showYearDropdown && (
-                  <div className={`${styles.yearDropdown} ${styles.yearDropdownRight}`}>
-                    {years.map((year) => (
-                      <button
-                        key={year}
-                        onClick={() => handleYearSelect(year)}
-                        className={`${styles.yearOption} ${year === effectiveMiniDate.getFullYear() ? styles.yearOptionSelected : ''
-                          }`}
-                      >
-                        {year}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </span>
-            </div>
-            <button onClick={handleNextMonth} className={styles.miniNavBtn} aria-label="Next month">
-              <ChevronRight />
-            </button>
-          </div>
-          <div className={styles.miniWeekdays}>
-            {weekdays.map((day, idx) => (
-              <span key={idx} className={styles.miniWeekday}>
-                {day}
-              </span>
-            ))}
-          </div>
-          <div className={styles.miniDays}>
-            {miniCalendarDays.map((day) => {
-              const isCurrentMonth = isSameMonth(day, effectiveMiniDate)
-              const isSelected = isSameDay(day, parseISO(currentDate))
-              const isTodayDate = isToday(day)
-              return (
-                <button
-                  key={day.toISOString()}
-                  className={`${styles.miniDay} ${!isCurrentMonth ? styles.otherMonth : ''} ${isSelected ? styles.selected : ''
-                    } ${isTodayDate ? styles.today : ''}`}
-                  onClick={() => handleDayClick(day)}
-                  onDoubleClick={() => handleDayDoubleClick(day)}
-                >
-                  {format(day, 'd')}
-                </button>
-              )
-            })}
-          </div>
-          <button className={styles.todayBtn} onClick={handleToday} data-component="sidebar-today-button">
-            Today
-          </button>
-        </div>
-
-        <div className={styles.calendars}>
-          <div className={styles.sectionTitleRow}>
-            <span className={styles.sectionTitle}>Calendars</span>
-            <div className={styles.addCalendarDropdown}>
-              <button
-                className={styles.addCalendarButton}
-                onClick={() => setShowAddCalendar(true)}
-                title="Add CalDAV account"
-              >
-                <PlusIcon />
+          <div className={styles.miniCalendar}>
+            <div className={styles.miniHeader}>
+              <button onClick={handlePrevMonth} className={styles.miniNavBtn} aria-label="Previous month">
+                <ChevronLeft />
               </button>
-            </div>
-          </div>
-          {calendars.map((calendar) => (
-            <label
-              key={calendar.id}
-              className={styles.calendarItem}
-              onContextMenu={(e) => handleContextMenu(e, calendar.id)}
-            >
-              <input
-                type="checkbox"
-                checked={calendar.isVisible}
-                onChange={() => toggleCalendarVisibility(calendar.id)}
-                className={styles.checkbox}
-              />
-              <button
-                className={styles.colorDot}
-                style={{ backgroundColor: calendar.color }}
-                onClick={() => {
-                  setShowColorPicker(true)
-                  setColorPickerId(calendar.id)
-                  setColorPickerName(calendar.name)
-                }
-                }
-                title="Click to change color"
-              />
-              {editingId === calendar.id ? (
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  onBlur={handleFinishRename}
-                  onKeyDown={handleKeyDown}
-                  className={styles.renameInput}
-                />
-              ) : (
-                <span
-                  className={styles.calendarName}
-                  onDoubleClick={() => handleStartRename(calendar.id, calendar.name)}
-                >
-                  {calendar.name}
-                </span>
-              )}
-              {calendar.accountId && (
-                <button
-                  className={`${styles.syncButton} ${syncingCalendarId === calendar.id ? styles.syncing : ''} ${syncStatus[calendar.id] === 'success' ? styles.success : ''} ${syncStatus[calendar.id] === 'error' ? styles.error : ''}`}
-                  onClick={() => handleSyncCalendar(calendar.id, calendar.accountId)}
-                  title="Sync calendar"
-                  disabled={!!syncingCalendarId}
-                >
-                  {syncStatus[calendar.id] === 'success' ? (
-                    <svg aria-hidden="true"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M20 6L9 17l-5-5" />
-                    </svg>
-                  ) : syncStatus[calendar.id] === 'error' ? (
-                    <svg aria-hidden="true"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
-                  ) : (
-                    <svg aria-hidden="true"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M23 4v6h-6M1 20v-6h6" />
-                      <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-                    </svg>
-                  )}
-                </button>
-              )}
-            </label>
-          ))}
-        </div>
-
-        <MiniTasksSection
-          isExpanded={isTasksExpanded}
-          onToggle={() => setIsTasksExpanded(!isTasksExpanded)}
-        />
-
-        <div className={styles.stickyBottom}>
-          {categories.length > 0 && (
-            <div className={styles.categoriesWrapper}>
-              <button
-                className={styles.sectionHeader}
-                onMouseEnter={() => setIsCategoriesExpanded(true)}
-                onMouseLeave={() => setIsCategoriesExpanded(false)}
-              >
-                <span className={styles.sectionTitle}>Categories</span>
-                <ChevronDown className={`${styles.chevron} ${isCategoriesExpanded ? styles.chevronExpanded : ''}`} />
-              </button>
-              <AnimatePresence>
-                {isCategoriesExpanded && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 5 }}
-                    transition={{ duration: 0.15 }}
-                    className={styles.categoryCard}
-                    onMouseEnter={() => setIsCategoriesExpanded(true)}
-                    onMouseLeave={() => setIsCategoriesExpanded(false)}
-                  >
-                    <div className={styles.categoryCardList}>
-                      {categories.map((category) => (
+              <div style={{ position: 'relative' }} ref={dropdownRef}>
+                <span className={styles.miniMonth}>
+                  <button onClick={handleMonthClick} className={styles.miniMonthButton}>
+                    {format(effectiveMiniDate, 'MMMM')}
+                  </button>
+                  {showMonthDropdown && (
+                    <div className={styles.yearDropdown}>
+                      {months.map((month, index) => (
                         <button
-                          key={category.id}
-                          className={`${styles.categoryItem} ${selectedCategoryIds.includes(category.id) ? styles.categoryItemSelected : ''}`}
-                          onClick={() => toggleCategoryFilter(category.id)}
+                          key={month}
+                          onClick={() => handleMonthSelect(index)}
+                          className={`${styles.yearOption} ${index === effectiveMiniDate.getMonth() ? styles.yearOptionSelected : ''
+                            }`}
                         >
-                          <span className={styles.categoryCheck}>
-                            <svg className={styles.categoryCheckSvg} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M2 6l3 3 5-5" />
-                            </svg>
-                          </span>
-                          <span
-                            className={styles.categoryDot}
-                            style={{ backgroundColor: category.color }}
-                          />
-                          <span className={styles.categoryName}>{category.name}</span>
+                          {month}
                         </button>
                       ))}
                     </div>
-                    <div className={styles.categoryToggle}>
-                      <span className={styles.categoryToggleLabel}>Use category colors</span>
-                      <label className={styles.categoryToggleSwitch}>
-                        <input
-                          type="checkbox"
-                          checked={useCategoryColors}
-                          onChange={() => updateSettings({ useCategoryColors: !useCategoryColors })}
-                        />
-                        <span className={styles.categoryTogglePill} />
-                      </label>
+                  )}
+                  <button onClick={handleYearClick} className={styles.miniMonthButton}>
+                    {format(effectiveMiniDate, 'yyyy')}
+                  </button>
+                  {showYearDropdown && (
+                    <div className={`${styles.yearDropdown} ${styles.yearDropdownRight}`}>
+                      {years.map((year) => (
+                        <button
+                          key={year}
+                          onClick={() => handleYearSelect(year)}
+                          className={`${styles.yearOption} ${year === effectiveMiniDate.getFullYear() ? styles.yearOptionSelected : ''
+                            }`}
+                        >
+                          {year}
+                        </button>
+                      ))}
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                  )}
+                </span>
+              </div>
+              <button onClick={handleNextMonth} className={styles.miniNavBtn} aria-label="Next month">
+                <ChevronRight />
+              </button>
             </div>
-          )}
-
-          <div className={styles.footer}>
-            <Link to="/privacy" className={styles.footerLink}>
-              Privacy
-            </Link>
-            <UpdateIndicator />
+            <div className={styles.miniWeekdays}>
+              {weekdays.map((day, idx) => (
+                <span key={idx} className={styles.miniWeekday}>
+                  {day}
+                </span>
+              ))}
+            </div>
+            <div className={styles.miniDays}>
+              {miniCalendarDays.map((day) => {
+                const isCurrentMonth = isSameMonth(day, effectiveMiniDate)
+                const isSelected = isSameDay(day, parseISO(currentDate))
+                const isTodayDate = isToday(day)
+                return (
+                  <button
+                    key={day.toISOString()}
+                    className={`${styles.miniDay} ${!isCurrentMonth ? styles.otherMonth : ''} ${isSelected ? styles.selected : ''
+                      } ${isTodayDate ? styles.today : ''}`}
+                    onClick={() => handleDayClick(day)}
+                    onDoubleClick={() => handleDayDoubleClick(day)}
+                  >
+                    {format(day, 'd')}
+                  </button>
+                )
+              })}
+            </div>
+            <button className={styles.todayBtn} onClick={handleToday} data-component="sidebar-today-button">
+              Today
+            </button>
           </div>
-        </div>
 
-        <ColorPickerModal
-          isOpen={showColorPicker}
-          calendarId={colorPickerId}
-          calendarName={colorPickerName}
-          onClose={() => {
-            setShowColorPicker(false)
-            setColorPickerId('')
-            setColorPickerName('')
-          }}
-        />
-        <AddCalendarModal isOpen={showAddCalendar} onClose={() => setShowAddCalendar(false)} />
-        <CreateCalendarModal
-          isOpen={showCreateCalendar}
-          onClose={() => {
-            setShowCreateCalendar(false)
-            setCreateCalendarAccountId(null)
-          }}
-          accountId={createCalendarAccountId}
-        />
-        <DeleteCalendarDialog
-          isOpen={showDeleteCalendar}
-          calendarId={deleteCalendarId}
-          calendarName={deleteCalendarName}
-          onClose={() => {
-            setShowDeleteCalendar(false)
-            setDeleteCalendarId(null)
-            setDeleteCalendarName('')
-          }}
-          onConfirm={async () => {
-            if (deleteCalendarId) {
-              try {
-                await deleteCalendarFromServer(deleteCalendarId)
-              } catch (error) {
-                showToast(error instanceof Error ? error.message : 'Failed to delete calendar')
-              }
-            }
-          }}
-        />
-        {contextMenu &&
-          createPortal(
-            <ContextMenu
-              x={contextMenu.x}
-              y={contextMenu.y}
-              items={[
-                {
-                  label: calendars.find((c) => c.id === contextMenu.calendarId)?.showTasksInViews
-                    ? 'Hide Tasks in Views'
-                    : 'Show Tasks in Views',
-                  onClick: () => {
-                    const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
-                    if (calendar) {
-                      updateCalendar(contextMenu.calendarId, {
-                        showTasksInViews: !calendar.showTasksInViews,
-                      })
-                    }
-                    closeContextMenu()
-                  },
-                },
-                {
-                  label: hideCompletedTasksInMonthView
-                    ? 'Show Completed Tasks'
-                    : 'Hide Completed Tasks',
-                  onClick: () => {
-                    updateSettings({ hideCompletedTasksInMonthView: !hideCompletedTasksInMonthView })
-                    closeContextMenu()
-                  },
-                },
-                // CalDAV calendar options
-                ...calendars.find((c) => c.id === contextMenu.calendarId)?.accountId
-                  ? [
-                    {
-                      label: 'Rename',
-                      onClick: () => {
-                        const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
-                        if (calendar) {
-                          setEditingId(calendar.id)
-                          setEditName(calendar.name)
-                        }
-                        closeContextMenu()
-                      },
-                    },
-                    {
-                      label: 'Create Calendar Here',
-                      onClick: () => {
-                        const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
-                        if (calendar?.accountId) {
-                          setCreateCalendarAccountId(calendar.accountId)
-                          setShowCreateCalendar(true)
-                        }
-                        closeContextMenu()
-                      },
-                    },
-                    {
-                      label: 'Delete',
-                      onClick: () => {
-                        const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
-                        if (calendar) {
-                          setDeleteCalendarId(calendar.id)
-                          setDeleteCalendarName(calendar.name)
-                          setShowDeleteCalendar(true)
-                        }
-                        closeContextMenu()
-                      },
-                    },
-                  ]
-                  : [
-                    {
-                      label: 'Remove',
-                      onClick: () => {
-                        deleteCalendar(contextMenu.calendarId)
-                        closeContextMenu()
-                      },
-                    },
-                  ],
-              ]}
-              onClose={closeContextMenu}
-              menuId="calendar-context"
-            />,
-            document.body
-          )}
-        {!isCompact && !isCollapsed && (
-          <div
-            className={styles.resizer}
-            onMouseDown={handleSidebarResizeStart}
+          <div className={styles.calendars}>
+            <div className={styles.sectionTitleRow}>
+              <span className={styles.sectionTitle}>Calendars</span>
+              <div className={styles.addCalendarDropdown}>
+                <button
+                  className={styles.addCalendarButton}
+                  onClick={() => setShowAddCalendar(true)}
+                  title="Add CalDAV account"
+                >
+                  <PlusIcon />
+                </button>
+              </div>
+            </div>
+            {calendars.map((calendar) => (
+              <label
+                key={calendar.id}
+                className={styles.calendarItem}
+                onContextMenu={(e) => handleContextMenu(e, calendar.id)}
+              >
+                <input
+                  type="checkbox"
+                  checked={calendar.isVisible}
+                  onChange={() => toggleCalendarVisibility(calendar.id)}
+                  className={styles.checkbox}
+                />
+                <button
+                  className={styles.colorDot}
+                  style={{ backgroundColor: calendar.color }}
+                  onClick={() => {
+                    setShowColorPicker(true)
+                    setColorPickerId(calendar.id)
+                    setColorPickerName(calendar.name)
+                  }
+                  }
+                  title="Click to change color"
+                />
+                {editingId === calendar.id ? (
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    onBlur={handleFinishRename}
+                    onKeyDown={handleKeyDown}
+                    className={styles.renameInput}
+                  />
+                ) : (
+                  <span
+                    className={styles.calendarName}
+                    onDoubleClick={() => handleStartRename(calendar.id, calendar.name)}
+                  >
+                    {calendar.name}
+                  </span>
+                )}
+                {calendar.accountId && (
+                  <button
+                    className={`${styles.syncButton} ${syncingCalendarId === calendar.id ? styles.syncing : ''} ${syncStatus[calendar.id] === 'success' ? styles.success : ''} ${syncStatus[calendar.id] === 'error' ? styles.error : ''}`}
+                    onClick={() => handleSyncCalendar(calendar.id, calendar.accountId)}
+                    title="Sync calendar"
+                    disabled={!!syncingCalendarId}
+                  >
+                    {syncStatus[calendar.id] === 'success' ? (
+                      <svg aria-hidden="true"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                    ) : syncStatus[calendar.id] === 'error' ? (
+                      <svg aria-hidden="true"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                    ) : (
+                      <svg aria-hidden="true"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M23 4v6h-6M1 20v-6h6" />
+                        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                      </svg>
+                    )}
+                  </button>
+                )}
+              </label>
+            ))}
+          </div>
+
+          <MiniTasksSection
+            isExpanded={isTasksExpanded}
+            onToggle={() => setIsTasksExpanded(!isTasksExpanded)}
           />
-        )}
+
+          <div className={styles.stickyBottom}>
+            {categories.length > 0 && (
+              <div className={styles.categoriesWrapper}>
+                <button
+                  className={styles.sectionHeader}
+                  onMouseEnter={() => setIsCategoriesExpanded(true)}
+                  onMouseLeave={() => setIsCategoriesExpanded(false)}
+                >
+                  <span className={styles.sectionTitle}>Categories</span>
+                  <ChevronDown className={`${styles.chevron} ${isCategoriesExpanded ? styles.chevronExpanded : ''}`} />
+                </button>
+                <AnimatePresence>
+                  {isCategoriesExpanded && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 5 }}
+                      transition={{ duration: 0.15 }}
+                      className={styles.categoryCard}
+                      onMouseEnter={() => setIsCategoriesExpanded(true)}
+                      onMouseLeave={() => setIsCategoriesExpanded(false)}
+                    >
+                      <div className={styles.categoryCardList}>
+                        {categories.map((category) => (
+                          <button
+                            key={category.id}
+                            className={`${styles.categoryItem} ${selectedCategoryIds.includes(category.id) ? styles.categoryItemSelected : ''}`}
+                            onClick={() => toggleCategoryFilter(category.id)}
+                          >
+                            <span className={styles.categoryCheck}>
+                              <svg className={styles.categoryCheckSvg} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M2 6l3 3 5-5" />
+                              </svg>
+                            </span>
+                            <span
+                              className={styles.categoryDot}
+                              style={{ backgroundColor: category.color }}
+                            />
+                            <span className={styles.categoryName}>{category.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <div className={styles.categoryToggle}>
+                        <span className={styles.categoryToggleLabel}>Use category colors</span>
+                        <label className={styles.categoryToggleSwitch}>
+                          <input
+                            type="checkbox"
+                            checked={useCategoryColors}
+                            onChange={() => updateSettings({ useCategoryColors: !useCategoryColors })}
+                          />
+                          <span className={styles.categoryTogglePill} />
+                        </label>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+
+            <div className={styles.footer}>
+              <Link to="/privacy" className={styles.footerLink}>
+                Privacy
+              </Link>
+              <UpdateIndicator />
+            </div>
+          </div>
+
+          <ColorPickerModal
+            isOpen={showColorPicker}
+            calendarId={colorPickerId}
+            calendarName={colorPickerName}
+            onClose={() => {
+              setShowColorPicker(false)
+              setColorPickerId('')
+              setColorPickerName('')
+            }}
+          />
+          <AddCalendarModal isOpen={showAddCalendar} onClose={() => setShowAddCalendar(false)} />
+          <CreateCalendarModal
+            isOpen={showCreateCalendar}
+            onClose={() => {
+              setShowCreateCalendar(false)
+              setCreateCalendarAccountId(null)
+            }}
+            accountId={createCalendarAccountId}
+          />
+          <DeleteCalendarDialog
+            isOpen={showDeleteCalendar}
+            calendarId={deleteCalendarId}
+            calendarName={deleteCalendarName}
+            onClose={() => {
+              setShowDeleteCalendar(false)
+              setDeleteCalendarId(null)
+              setDeleteCalendarName('')
+            }}
+            onConfirm={async () => {
+              if (deleteCalendarId) {
+                try {
+                  await deleteCalendarFromServer(deleteCalendarId)
+                } catch (error) {
+                  showToast(error instanceof Error ? error.message : 'Failed to delete calendar')
+                }
+              }
+            }}
+          />
+          {contextMenu &&
+            createPortal(
+              <ContextMenu
+                x={contextMenu.x}
+                y={contextMenu.y}
+                items={[
+                  {
+                    label: calendars.find((c) => c.id === contextMenu.calendarId)?.showTasksInViews
+                      ? 'Hide Tasks in Views'
+                      : 'Show Tasks in Views',
+                    onClick: () => {
+                      const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
+                      if (calendar) {
+                        updateCalendar(contextMenu.calendarId, {
+                          showTasksInViews: !calendar.showTasksInViews,
+                        })
+                      }
+                      closeContextMenu()
+                    },
+                  },
+                  {
+                    label: hideCompletedTasksInMonthView
+                      ? 'Show Completed Tasks'
+                      : 'Hide Completed Tasks',
+                    onClick: () => {
+                      updateSettings({ hideCompletedTasksInMonthView: !hideCompletedTasksInMonthView })
+                      closeContextMenu()
+                    },
+                  },
+                  // CalDAV calendar options
+                  ...calendars.find((c) => c.id === contextMenu.calendarId)?.accountId
+                    ? [
+                      {
+                        label: 'Rename',
+                        onClick: () => {
+                          const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
+                          if (calendar) {
+                            setEditingId(calendar.id)
+                            setEditName(calendar.name)
+                          }
+                          closeContextMenu()
+                        },
+                      },
+                      {
+                        label: 'Create Calendar Here',
+                        onClick: () => {
+                          const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
+                          if (calendar?.accountId) {
+                            setCreateCalendarAccountId(calendar.accountId)
+                            setShowCreateCalendar(true)
+                          }
+                          closeContextMenu()
+                        },
+                      },
+                      {
+                        label: 'Delete',
+                        onClick: () => {
+                          const calendar = calendars.find((c) => c.id === contextMenu.calendarId)
+                          if (calendar) {
+                            setDeleteCalendarId(calendar.id)
+                            setDeleteCalendarName(calendar.name)
+                            setShowDeleteCalendar(true)
+                          }
+                          closeContextMenu()
+                        },
+                      },
+                    ]
+                    : [
+                      {
+                        label: 'Remove',
+                        onClick: () => {
+                          deleteCalendar(contextMenu.calendarId)
+                          closeContextMenu()
+                        },
+                      },
+                    ],
+                ]}
+                onClose={closeContextMenu}
+                menuId="calendar-context"
+              />,
+              document.body
+            )}
+          {!isCompact && !isCollapsed && (
+            <div
+              className={styles.resizer}
+              onMouseDown={handleSidebarResizeStart}
+            />
+          )}
         </div>
       </div>
     </>
